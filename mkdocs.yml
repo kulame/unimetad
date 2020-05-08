@@ -1,0 +1,38 @@
+site_name: unimetad服务
+site_description: Python Boilerplate contains all the boilerplate you need to create a Python package.
+site_url: https://www.igengmei.com
+
+theme:
+    name: "material"
+    palette:
+        primary: "teal"
+        accent: "amber"
+    logo: "img/favicon.png"
+    favicon: "img/favicon.png"
+
+repo_name: unimetad
+repo_url: https://gengmei.coding.net/p/tob/d/unimetad/git
+edit_uri: ''
+
+
+nav:
+    - Features: 'features.md'
+    - 设计: 'design.md'
+    - 数据: 'models.md'
+
+markdown_extensions:
+    - toc:
+        permalink: true
+    - markdown.extensions.codehilite:
+        guess_lang: false
+    - markdown_include.include:
+        base_path: docs
+    - admonition
+    - codehilite
+    - extra
+
+extra_css:
+    - 'css/custom.css'
+
+extra_javascript:
+    - 'js/custom.js'
