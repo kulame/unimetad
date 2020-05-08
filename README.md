@@ -7,9 +7,9 @@ unimetad 元数据管理服务器
 1. 环境准备
 
 ```sh
-mkdir -p /data/log/{project_name}/app
-virtualenv .venv -p python3.8
-source .venv/bin/activate
+pip install hatch
+hatch env dev
+hatch shell dev
 # 创建虚拟环境，安装依赖
 pip install -r requirements.txt
 ```
