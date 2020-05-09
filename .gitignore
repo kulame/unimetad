@@ -1,0 +1,13 @@
+*.log
+.env
+*.pyc
+.cache/
+.coverage
+.idea/
+.vscode/
+unimeta.egg-info/
+build/
+dist/
+docs/build/
+venv/
+wheelhouse/

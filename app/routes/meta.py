@@ -1,38 +1,33 @@
 from fastapi import FastAPI
-import databases
-import orm
 import sqlalchemy
-from unimeta.model import MetaEventReq
 from devtools import debug
-from databases import Database
 import os
-
 from fastapi import APIRouter
+from pydantic import BaseModel
+from fastapi_sqlalchemy import db 
+from app.models import MetaTable
 
 router: APIRouter = APIRouter()
 
-database_url = os.getenv("UNIMETA_DATABASE_URL", None)
-database = Database(database_url)
-await database.connect()
-
-
-metadata = sqlalchemy.MetaData()
-
-MetaEvent = sqlalchemy.Table(
-    "meta_table",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("name", sqlalchemy.String(length=200)),
-    sqlalchemy.Column("meta", sqlalchemy.JSON()),
-    sqlalchemy.Column("version", sqlalchemy.Integer),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime),
-    sqlalchemy.Column("creator", sqlalchemy.String(length=200))
-)
 
 
 
 
-@router.post("/event")
+
+
+class MetaEventReq(BaseModel):
+    name: str
+    meta: dict 
+    producer: str
+
+
+
+#TODO 实现元数据写入接口
+#TODO 实现元数据读取接口
+#TODO 实现元数据查询页面
+
+
+@router.post("/events")
 async def create_event_meta(req:MetaEventReq) -> dict:
     """
     @api {post} /metatable/ Create Meta Information
@@ -45,7 +40,7 @@ async def create_event_meta(req:MetaEventReq) -> dict:
     @apiSuccess {int} status 创建状态.
 """
     debug(req)
-    query = "SELECT * FROM notes WHERE id = :id"
-    result = await database.fetch_one(query=query, values={"id": 1})
+    result = db.session.query(MetaTable).all()
+    debug(result)
 
     return {"Hello": "World"}
