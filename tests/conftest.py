@@ -2,10 +2,26 @@ import sys
 
 import pytest
 from fastapi import FastAPI
-from starlette.testclient import TestClient
 from app import config
-from app.models import metadata
 from app.routes.api import router
+from app.models import metadata
+from fastapi.testclient import TestClient
+import databases
+from sqlalchemy import create_engine
+
+
+#TODO implement test database generate
+
+DATABASE_URL = "sqlite:///./test.db"
+# DATABASE_URL = "postgresql://user:password@postgresserver/db"
+
+database = databases.Database(DATABASE_URL)
+
+engine = create_engine(
+    DATABASE_URL, connect_args={"check_same_thread": False}
+)
+
+metadata.create_all(engine)
 
 @pytest.fixture
 def app():
@@ -20,21 +36,12 @@ def client(app):
         yield c
 
 
-@pytest.fixture
-def DBSessionMiddleware():
-    from fastapi_sqlalchemy import DBSessionMiddleware
-
-    yield DBSessionMiddleware
-
 
 def get_settings_override():
     return config.Settings(DATABASE_URL="sqlite://")
 
 @pytest.fixture
 def db():
-    from fastapi_sqlalchemy import db
-    metadata.create_all(db)
-    
     yield db
 
     # force reloading of module to clear global state

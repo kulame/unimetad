@@ -4,9 +4,7 @@ from devtools import debug
 import os
 from fastapi import APIRouter
 from pydantic import BaseModel
-from fastapi_sqlalchemy import db 
-from app.models import MetaTable
-
+from app.models import MetaTable, database
 router: APIRouter = APIRouter()
 
 
@@ -40,7 +38,5 @@ async def create_event_meta(req:MetaEventReq) -> dict:
     @apiSuccess {int} status 创建状态.
 """
     debug(req)
-    result = db.session.query(MetaTable).all()
-    debug(result)
-
-    return {"Hello": "World"}
+    query = MetaTable.select()
+    return await database.fetch_all(query)

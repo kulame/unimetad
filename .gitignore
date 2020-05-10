@@ -5,6 +5,7 @@
 .coverage
 .idea/
 .vscode/
+test.db
 unimeta.egg-info/
 build/
 dist/

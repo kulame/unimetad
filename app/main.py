@@ -4,8 +4,7 @@ from app.libs.http import setup_session  # type: ignore
 from app.libs.http import teardown_session
 from app.routes.api import router
 from app.config import get_settings
-from fastapi_sqlalchemy import DBSessionMiddleware
-
+from app.models import database
 
 
 
@@ -22,9 +21,17 @@ def get_app():
     )
     
     database_url = settings.DATABASE_URL
-    app.add_middleware(DBSessionMiddleware, db_url=database_url)
     app.include_router(router, prefix="/api", tags=["api"])
     return app
 
 app = get_app()
+
+@app.on_event("startup")
+async def startup():
+    await database.connect()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
 
