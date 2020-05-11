@@ -28,6 +28,8 @@ MetaTable = Table(
     Column('name', String(200)),
     Column('meta', JSON),
     Column('created_at', DateTime),
-    Column('producer', String(200))
+    Column('producer', String(200)),
+    Column("version",Integer),
+    Column("sign",String(200))
 )
 

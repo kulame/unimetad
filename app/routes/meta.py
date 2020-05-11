@@ -1,13 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 import sqlalchemy
 from devtools import debug
-import os
+import os, json
 from fastapi import APIRouter
 from pydantic import BaseModel
 from fastapi import Depends
 from app.models import MetaTable, get_db
 from databases import Database
-
+from datetime import datetime
+from app.libs.avro import sign_avro
 router: APIRouter = APIRouter()
 
 
@@ -28,8 +29,8 @@ class MetaEventReq(BaseModel):
 #TODO 实现元数据查询页面
 
 
-@router.post("/events")
-async def create_event_meta(req:MetaEventReq, database:Database=Depends(get_db)) -> dict:
+@router.post("/events", status_code=status.HTTP_201_CREATED)
+async def create_event_meta(req:MetaEventReq, resp:Response, database:Database=Depends(get_db)) -> dict:
     """
     @api {post} /metatable/ Create Meta Information
     @apiName GetMetaTable
@@ -40,6 +41,36 @@ async def create_event_meta(req:MetaEventReq, database:Database=Depends(get_db))
     @apiParam {String} creator meta creator.
     @apiSuccess {int} status 创建状态.
 """
-    debug(req)
-    query = MetaTable.select()
-    return await database.fetch_all(query)
+    signed = sign_avro(req.meta)
+    query = "select max(version) from metatable where name=:name"
+    res = await database.fetch_one(query=query, values={"name":req.name})
+    version = res[0]
+    if version is None:
+        count = 0
+        version = 0 
+    else:
+        query = "select count(*) from metatable where name=:name and sign=:sign"
+        res =  await database.fetch_one(query=query, values={"name":req.name,"sign":signed})
+        count = res[0]
+        version = version +1
+
+    if count == 0:
+        query = "insert into metatable(name,meta,created_at,producer,version,sign) values(:name,:meta,:created_at,:producer,:version,:sign)"
+        value = {
+            "name": req.name,
+            "meta": json.dumps(req.meta),
+            "created_at":datetime.now(),
+            "producer":req.producer,
+            "version":version,
+            "sign":signed
+        }
+        res = await database.execute(query, value)
+    else:
+        resp.status_code = status.HTTP_200_OK
+        
+    query = "select id, version from metatable where name=:name and sign=:sign"
+    res= await database.fetch_one(query,{"name":req.name,"sign":signed})
+    event_id, event_version = res
+     
+
+    return {"id":event_id, "version":event_version}
