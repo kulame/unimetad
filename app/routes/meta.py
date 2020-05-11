@@ -4,7 +4,10 @@ from devtools import debug
 import os
 from fastapi import APIRouter
 from pydantic import BaseModel
-from app.models import MetaTable, database
+from fastapi import Depends
+from app.models import MetaTable, get_db
+from databases import Database
+
 router: APIRouter = APIRouter()
 
 
@@ -26,7 +29,7 @@ class MetaEventReq(BaseModel):
 
 
 @router.post("/events")
-async def create_event_meta(req:MetaEventReq) -> dict:
+async def create_event_meta(req:MetaEventReq, database:Database=Depends(get_db)) -> dict:
     """
     @api {post} /metatable/ Create Meta Information
     @apiName GetMetaTable

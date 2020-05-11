@@ -4,12 +4,10 @@ from app.libs.http import setup_session  # type: ignore
 from app.libs.http import teardown_session
 from app.routes.api import router
 from app.config import get_settings
+import databases
 from app.models import database
 
-
-
-def get_app():
-    settings = get_settings()
+def get_app():    
     app = FastAPI(
         title="unimetad API",
         description=("unimetad API"),
@@ -19,8 +17,6 @@ def get_app():
         on_startup=[setup_session],
         on_shutdown=[teardown_session],
     )
-    
-    database_url = settings.DATABASE_URL
     app.include_router(router, prefix="/api", tags=["api"])
     return app
 
