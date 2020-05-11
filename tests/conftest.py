@@ -2,7 +2,7 @@ import sys
 
 import pytest
 from fastapi import FastAPI
-from app import config
+from app.config import get_settings
 from app.main import app
 from app.routes.api import router
 from app.models import get_db, metadata
@@ -23,16 +23,26 @@ from sqlalchemy import create_engine
 # async def shutdown():
 #     await database.disconnect()
 
-DATABASE_URL = "sqlite:///./test.db"
-database = databases.Database(DATABASE_URL, force_rollback=True)
+database_url = "sqlite:///./test.db"
+def get_settings_override():
+    settings = get_settings()
+    settings['DATABASE_URL'] = database_url
+    return settings
 
-def db():   
+def db():  
+    database = databases.Database(database_url, force_rollback=True) 
     engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}
+    database_url, connect_args={"check_same_thread": False}
     )
     metadata.create_all(engine)
  
     return database
+
+
+app.dependency_overrides[get_settings] = get_settings_override
+    
+
+
 
 @pytest.fixture
 def client():
