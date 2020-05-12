@@ -5,10 +5,12 @@ import os, json
 from fastapi import APIRouter
 from pydantic import BaseModel
 from fastapi import Depends
-from app.models import MetaTable, get_db
+from app.models import MetaTable, get_db, metadata
 from databases import Database
 from datetime import datetime
 from app.libs.avro import sign_avro
+from app.libs.db import ddl
+
 router: APIRouter = APIRouter()
 
 
@@ -72,5 +74,5 @@ async def create_event_meta(req:MetaEventReq, resp:Response, database:Database=D
     res= await database.fetch_one(query,{"name":req.name,"sign":signed})
     event_id, event_version = res
      
-
+    
     return {"id":event_id, "version":event_version}

@@ -6,6 +6,7 @@ from app.config import get_settings
 import databases
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from devtools import debug
 #TODO implement test database generate
 
 

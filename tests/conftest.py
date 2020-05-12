@@ -9,6 +9,7 @@ from app.models import get_db, metadata
 from fastapi.testclient import TestClient
 import databases
 from sqlalchemy import create_engine
+from devtools import debug
 
 #TODO implement test database generate
 
@@ -35,7 +36,6 @@ def db():
     database_url, connect_args={"check_same_thread": False}
     )
     metadata.create_all(engine)
- 
     return database
 
 
