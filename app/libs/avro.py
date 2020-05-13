@@ -7,7 +7,11 @@ def sign_avro(avro:dict) -> str:
     signed = {item['name']:item['type'] for item in fields}
     lines = []
     for k in sorted(signed.keys()):
-        lines.append("{key}_{value}".format(key=k, value=signed[k]))
+        v = signed[k]
+        if isinstance(v,list):
+            value = ":".join(sorted(v))
+        else:
+            value = v
+        lines.append("{key}__{value}".format(key=k, value=value))
     raw = "&".join(lines)
-    debug(raw)
     return hashlib.md5(raw.encode('utf-8')).hexdigest()

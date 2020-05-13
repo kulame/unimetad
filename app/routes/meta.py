@@ -5,7 +5,7 @@ import os, json
 from fastapi import APIRouter
 from pydantic import BaseModel
 from fastapi import Depends
-from app.models import MetaTable, get_db, metadata
+from app.models import MetaTable, get_db, metadata, database
 from databases import Database
 from datetime import datetime
 from app.libs.avro import sign_avro
@@ -32,7 +32,7 @@ class MetaEventReq(BaseModel):
 
 
 @router.post("/events", status_code=status.HTTP_201_CREATED)
-async def create_event_meta(req:MetaEventReq, resp:Response, database:Database=Depends(get_db)) -> dict:
+async def create_event_meta(req:MetaEventReq, resp:Response) -> dict:
     """
     @api {post} /metatable/ Create Meta Information
     @apiName GetMetaTable
