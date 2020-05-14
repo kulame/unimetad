@@ -6,7 +6,7 @@ BEGIN;
 CREATE TABLE metatable (
 	id INTEGER NOT NULL AUTO_INCREMENT, 
 	name VARCHAR(200), 
-	meta JSON, 
+	meta TEXT, 
 	created_at DATETIME, 
 	producer VARCHAR(200), 
 	version INTEGER, 

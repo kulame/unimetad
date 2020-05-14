@@ -14,7 +14,7 @@ from devtools import debug
 def get_db() -> databases.Database:
     settings = get_settings()
     database_url = settings.DATABASE_URL
-    database = databases.Database(database_url, min_size=100, max_size=1000)
+    database = databases.Database(database_url, min_size=10, max_size=200)
     return database
 
 database = get_db()
