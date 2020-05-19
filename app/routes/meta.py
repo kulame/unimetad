@@ -91,12 +91,16 @@ async def create_event_meta(req:MetaEventReq, resp:Response) -> dict:
     return {'status':0, "data":data}
 
 @router.get("/events/")
-async def query_event_meta(name:str, version:int) -> dict:
+async def query_event_meta(name:str, version:int,resp:Response) -> dict:
     name =urllib.parse.unquote(name)
     query = "select id,meta from metatable where name=:name and version=:version"
     data = {"name":name,"version":version}
     res = await database.fetch_one(query=query, values=data)
-    id, meta = res
-    meta = json.loads(meta)
-    data = {'id':id, 'meta':meta}
-    return {'status':0, "data":data}
+    if res:
+        id, meta = res
+        meta = json.loads(meta)
+        data = {'id':id, 'meta':meta}
+        return {'status':0, "data":data}
+    else:
+        resp.status_code = status.HTTP_404_NOT_FOUND
+        return {"status":1}
