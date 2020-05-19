@@ -23,6 +23,11 @@ class MetaEventReq(BaseModel):
     name: str
     meta: dict 
     producer: str
+    dataframe:str
+    dataset:str
+    scheme:str
+    host:str
+    port:int
 
 
 
@@ -55,16 +60,21 @@ async def create_event_meta(req:MetaEventReq, resp:Response) -> dict:
         res =  await database.fetch_one(query=query, values={"name":req.name,"sign":signed})
         count = res[0]
         version = version +1
-
+    debug(count)
     if count == 0:
-        query = "insert into metatable(name,meta,created_at,producer,version,sign) values(:name,:meta,:created_at,:producer,:version,:sign)"
+        query = "insert into metatable(name,meta,created_at,producer,version,sign, dataframe, dataset, scheme, host, port) values(:name,:meta,:created_at,:producer,:version,:sign,:dataframe, :dataset,:scheme,:host,:port)"
         value = {
             "name": req.name,
             "meta": json.dumps(req.meta),
             "created_at":datetime.now(),
             "producer":req.producer,
             "version":version,
-            "sign":signed
+            "sign":signed,
+            "dataframe":req.dataframe,
+            "dataset":req.dataset,
+            "scheme":req.scheme,
+            "host":req.host,
+            "port":req.port
         }
         res = await database.execute(query, value)
     else:

@@ -6,6 +6,7 @@ from app.routes.api import router
 from app.config import get_settings
 import databases
 from app.models import database
+from loguru import logger
 
 def get_app():    
     app = FastAPI(
@@ -25,9 +26,11 @@ app = get_app()
 @app.on_event("startup")
 async def startup():
     await database.connect()
+    logger.success("connect database success")
 
 
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
+    logger.success("disconnect database success")
 

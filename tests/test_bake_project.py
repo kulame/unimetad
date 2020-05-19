@@ -25,6 +25,13 @@ def test_connection(client):
 
     resp = client.post(
         "api/meta/events",
-        json={"name": "test","meta":schema,"producer":"kula"},
+        json={"name": "test",
+        "meta":schema,
+        "producer":"kula",
+        "dataframe":"test",
+        "dataset":"test",
+        "scheme":"mysql",
+        "host":"127.0.0.1",
+        "port":3306},
     )
     debug(resp.json())

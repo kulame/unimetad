@@ -1,4 +1,6 @@
 %syntax-version=1.0.0
 %project=unimated
+%uri=git@e.coding.net:gengmei/gmarch/unimetad.git
 
 metable 2020-05-12T13:34:55Z kula,,, <kula@office> # create metatables
+table_db_scheme 2020-05-19T05:40:30Z kula,,, <kula@office> # add table databse scheme structure
