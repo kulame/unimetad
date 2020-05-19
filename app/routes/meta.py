@@ -8,8 +8,10 @@ from fastapi import Depends
 from app.models import MetaTable, get_db, metadata, database
 from databases import Database
 from datetime import datetime
-from app.libs.avro import sign_avro
+from app.libs.avro import sign_avro, check_avro, MetaStatus
 from app.libs.db import ddl
+import urllib
+from fastapi.responses import ORJSONResponse
 
 router: APIRouter = APIRouter()
 
@@ -36,7 +38,7 @@ class MetaEventReq(BaseModel):
 #TODO 实现元数据查询页面
 
 
-@router.post("/events", status_code=status.HTTP_201_CREATED)
+@router.post("/events/", status_code=status.HTTP_201_CREATED)
 async def create_event_meta(req:MetaEventReq, resp:Response) -> dict:
     """
     @api {post} /metatable/ Create Meta Information
@@ -48,6 +50,10 @@ async def create_event_meta(req:MetaEventReq, resp:Response) -> dict:
     @apiParam {String} creator meta creator.
     @apiSuccess {int} status 创建状态.
 """
+    mstatus = check_avro(req.meta)
+    if mstatus != MetaStatus.SUCCESS:
+        return {"status":mstatus}
+
     signed = sign_avro(req.meta)
     query = "select max(version) from metatable where name=:name"
     res = await database.fetch_one(query=query, values={"name":req.name})
@@ -60,7 +66,6 @@ async def create_event_meta(req:MetaEventReq, resp:Response) -> dict:
         res =  await database.fetch_one(query=query, values={"name":req.name,"sign":signed})
         count = res[0]
         version = version +1
-    debug(count)
     if count == 0:
         query = "insert into metatable(name,meta,created_at,producer,version,sign, dataframe, dataset, scheme, host, port) values(:name,:meta,:created_at,:producer,:version,:sign,:dataframe, :dataset,:scheme,:host,:port)"
         value = {
@@ -79,10 +84,19 @@ async def create_event_meta(req:MetaEventReq, resp:Response) -> dict:
         res = await database.execute(query, value)
     else:
         resp.status_code = status.HTTP_200_OK
-        
     query = "select id, version from metatable where name=:name and sign=:sign"
     res= await database.fetch_one(query,{"name":req.name,"sign":signed})
     event_id, event_version = res
-     
-    
-    return {"id":event_id, "version":event_version}
+    data = {"id":event_id, "version":event_version}
+    return {'status':0, "data":data}
+
+@router.get("/events/")
+async def query_event_meta(name:str, version:int) -> dict:
+    name =urllib.parse.unquote(name)
+    query = "select id,meta from metatable where name=:name and version=:version"
+    data = {"name":name,"version":version}
+    res = await database.fetch_one(query=query, values=data)
+    id, meta = res
+    meta = json.loads(meta)
+    data = {'id':id, 'meta':meta}
+    return {'status':0, "data":data}

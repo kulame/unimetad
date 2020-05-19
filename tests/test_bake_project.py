@@ -2,7 +2,7 @@ from loguru import logger
 from starlette.testclient import TestClient
 from devtools import debug
 from starlette.middleware.base import BaseHTTPMiddleware
-
+import urllib
 
 
 
@@ -24,7 +24,7 @@ def test_connection(client):
     }
 
     resp = client.post(
-        "api/meta/events",
+        "api/meta/events/",
         json={"name": "test",
         "meta":schema,
         "producer":"kula",
@@ -34,4 +34,9 @@ def test_connection(client):
         "host":"127.0.0.1",
         "port":3306},
     )
+    debug(resp.json())
+    name = urllib.parse.quote("test")
+    url = "api/meta/events/?name={name}&version=0".format(name=name)
+    debug(url)
+    resp = client.get(url)
     debug(resp.json())
