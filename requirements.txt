@@ -13,7 +13,7 @@ pytest
 pre-commit==1.4.3
 tox
 termcolor==1.1.0
-aiohttp==3.6.2
+aiohttp==3.7.4
 loguru==0.4.1
 black==19.10b0
 flake8==3.7.9
